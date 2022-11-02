@@ -1,4 +1,4 @@
-{{import file2.md as file2}}
+{{import /file2.md as file2}}
 # Hello, World!
 
 File 2:
