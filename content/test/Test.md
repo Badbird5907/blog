@@ -22,3 +22,5 @@ $1\cdot2\times\frac{1}{2^x_1}$
 
 # Hi
 <StaticTweet id="1591139507478614016" />
+
+Testing revalidate
