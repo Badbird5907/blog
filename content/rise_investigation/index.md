@@ -1,5 +1,8 @@
 I'll try to keep this blog post up to date.
 
+# Twitter Thread:
+<StaticTweet id="https://twitter.com/Badbird_5907/status/1621316121059069954" />
+
 # Strings
 List of strings dumps on the files:
 
