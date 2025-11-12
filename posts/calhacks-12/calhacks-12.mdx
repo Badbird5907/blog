@@ -1,0 +1,54 @@
+---
+title: "Building Vibecheck: Re-imagining technical interviews at CalHacks 12.0"
+summary: "My experience building Vibecheck at Calhacks 12.0"
+date: "2025-11-04"
+author: "Evan Yu"
+---
+
+Two weeks ago, I travelled to San Francisco with 3 friends to participate in Cal Hacks 12.0, a 48 hour hackathon hosted by UC Berkeley at the Palace of Fine arts.
+Our team consisted of 4 members: Me (Evan Yu), Ethan Ng, Luke Griggs, and Aaronkhan Hubhachen.
+
+At the start of the hackathon, we didn't have a clear idea of what to build. The one thing we all had in common, though, was our experience with technical interviews.
+We'd all spent hours balancing binary search trees, optimizing dynamic programming problems, and memorizing Dijkstra's algorithm. These skills, ironically, rarely come up in real-world software development.
+
+With the advent of AI, developers are expected to be able to effectively utilize AI in their daily work. Every day, we use AI tools like ChatGPT, Cursor, and Claude Code to help us ship code faster and more efficiently.
+
+So, we decided to build VibeCheck: a interview platform that reimagines the traditional technical interview process; A platform that evaluates developers holistically. Our goal was to evaluate developers not just on their coding ability,
+but also on how effectively they use AI, leveraging it as a tool rather than becoming blindly dependent on it (vibecoding).
+
+Essentially, we wanted to create a interview platform that tests engineers on what they actually do on the job, with the help of AI.
+
+# The Process
+
+## Day 1: The Beginning
+I landed in SF friday morning with a sore throat, which eventually evolved into a full-blown cold. At the venue, I met up with Ethan and Luke, and we spent the first couple hours running around the venue, grabbing all the free swag we could get our hands on.
+
+### Hour 3 - Brainstorming
+Once the hackathon began and our team finally gathered, we dove straight into brainstorming ideas. We came in completely unprepared, and as we talked,
+Aaron just arrived fresh from an interview. That got us talking on how challenging and frustrating technical interviews were. Before that, I mentioned that I had some experience building in-browser IDEs (like [Runway](https://runway.badbird.dev/) and [PyEval](https://py.evanyu.dev/)).
+From there, the idea for VibeCheck started to take shape: an interview platform that lets candidates code in an environment that feels just like the one they'd use on the job.
+
+### Hour 4 - The Roadblock
+As we started scoping out the project, we quickly hit a major roadblock: the Wi-Fi was awful, and we could barely get anything done.
+To make matters worse, the air quality was terrible, which helped to further irritate my sore throat. That's when we decided to pack up and head to Luke's brother's apartment on the south side of SF. 
+
+Once we settled in, we split up the work: I focused on building the in-browser IDE, drawing on my experience with Monaco and WebContainers. Ethan took charge of the AI implementation and connecting it to the filesystem/editor, while Luke and Aaron worked on building and validating the holistic AI grading system.
+
+![Late night coding session at Luke's brother's apartment](@day0.png)
+
+## Day 2: Integration
+
+We woke up early on Saturday morning, well-rested and ready to keep building. I spent the day continuing development on the in-browser IDE, while Ethan shipped an MVP of the AI integration featuring patch-based edits. 
+That night, we had to vacate the apartment since Luke's brother had friends over. We relocated to a warehouse-turned-hacker house [Jared](https://x.com/sudoredj) was renting out, called [Vivarium](https://x.com/vivariumsf) (check them out, it's pretty cool (and disturbing)). 
+I stayed up until 7 a.m. implementing proper tool calling on the client side and completing the integration between the onboarding flow and the submission flow.
+
+![Vivarium](@vivarium.png)
+
+## Day 3: Chaos...
+At 8 a.m. on Sunday morning, we finally finished the project. Instead of recording our demo right then and there, we decided to Uber back to the venue, assuming the Wi-Fi would be better. **Big mistake.** The Wi-Fi was somehow even worse than before; we couldn’t connect to it at all.
+Desperate, we ended up recording our demo crouched on the sidewalk outside the Palace of Fine Arts, relying on painfully slow cellular data. In a stroke of genius, we realized that YouTube Studio allows post-upload editing, so we uploaded our demo, submitted the link at the last minute, and painstakingly trimmed the video to fit the time limit; all on sluggish cellular data, as the airwaves were completely clogged with hundreds of other hackers doing the same.
+To make matters worse, we were hit with one issue after another: the demo would randomly hit edge cases and break, our audio cut out at the worst times, and our cell connection kept dropping. Somehow, through all of that, we still managed to get the final demo submitted just in time after a clutch 5 minute deadline extension.
+
+# So, what did we build?
+
+Hi! This section is a WIP, so come back later!
