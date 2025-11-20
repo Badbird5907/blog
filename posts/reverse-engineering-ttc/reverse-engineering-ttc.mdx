@@ -1,0 +1,155 @@
+---
+title: "Reverse Engineering the TTC API"
+summary: "How I built a free, unofficial bus and streetcar arrival times API for the Toronto Transit Commission"
+date: "2025-11-19"
+author: "Evan Yu"
+---
+import { TwitterTweetEmbed } from 'react-twitter-embed';
+
+It's Nov 19, I'm procrastinating studying for my exams by scrolling on twitter. Over the last week, I've been seeing this LED matrix
+display with bus times (tidbyt) getting some traction.
+
+Then, I see this tweet:
+<TwitterTweetEmbed tweetId="1990948613321535773" options={{ theme: "dark", cards: "hidden" }} />
+
+
+> (TTC soon)
+
+*It can't be that hard to reverse engineer the TTC API, right?*
+This was the thought that threw me down the rabbit hole. I started by doing a quick Google search, since someone's probably already done it, right?
+Nope. The only result was [`https://myttc.ca/developers`](https://myttc.ca/developers), a nearly twenty year old project that didn't seem to work anymore.
+
+![MyTTC Error](@myttc-error.png)
+Pretty funny, haha
+
+So, I started by poking around the TTC website, recording and analyzing it's network traffic. My google searches also yielded one website: [`https://bustime.ttc.ca/`](https://bustime.ttc.ca/), which looked promising.
+![Bustime](@bustime-1.png)
+
+However, when I tried to call one of it's API endpoints, I was denied access!
+![Bustime Error](@bustime-access-denied.png)
+
+After some quick googling, I also found this: [`https://bustime.ttc.ca/gtfsrt/`](https://bustime.ttc.ca/gtfsrt/) (gtfsrt = [General Transit Feed Specification Real-Time](https://gtfs.org/documentation/realtime/reference/)), it looked like exactly what I was looking for!
+
+I spun up a quick parser using protobuf and a couple outer libraries, and I got some data out of it!
+
+I then realized the gtfsrt data was incomplete, and didn't include much of the data I was looking for (street names, bus lines, etc...).
+
+So, I started digging through https://ttc.ca/ again.
+![TTC Website](@ttc-website.png)
+
+I found `https://www.ttc.ca/ttcapi/routedetail/GetNextBuses?routeId=510&stopCode=7347`, looks like exactly what I was looking for!
+![Nextbus API](@nextbus-api.png)
+
+Nope... Not the fine grained data I was looking for.
+
+What about `https://www.ttc.ca/ttcapi/routedetail/get?id=310`?
+![Route Detail API](@routedetail-get-1.png)
+
+That's more like it! I got something like this:
+```js
+z.object({
+  message: z.string().nullable(),
+  is10MinutesNetwork: z.boolean(),
+  frequency: z.string().nullable(),
+  serviceLevel: z.object({
+    name: z.string().nullable(),
+    description: z.string().nullable(),
+    color: z.string().nullable(),
+    cssClassDashboard: z.string(),
+    cssClassConnectingBus: z.string(),
+  }),
+  mapUrl: z.string().nullable(),
+  direction: z.number(),
+  inService: z.boolean(),
+  helpInfo: z.string().nullable(),
+  legendInfo: z.string().nullable(),
+  id: z.number(),
+  gtfsId: z.string(),
+  agencyId: z.number(),
+  agency: z.string().nullable(),
+  shortName: z.string(),
+  longName: z.string(),
+  description: z.string(),
+  type: z.number(),
+  url: z.string(),
+  colour: z.string().nullable(),
+  textColour: z.string().nullable(),
+  active: z.boolean(),
+  trips: z.array(z.unknown()),
+});
+```
+
+... and `https://www.ttc.ca/ttcapi/routedetail/bystopcode?stopcode=7347` gives an array of routes that serve that stop!
+
+... so now I should have everything I need to build the API right? ...right?
+
+... nope. I still need a list of time estimates for each route at each stop. `/GetNextBuses` does that, but it's not very detailed
+nor "safe" (imo) to parse. The GTFSRT vehicles endpoint includes a list of vehicles, but I would need to match that up with the
+GTFSRT trips endpoint to get some form of time estimate. I thought this was too complicated, and not very efficient.
+
+My mind kept wandering back to the bustime website. If I could break it's auth, I could get all the data I want in once place.
+Going back to [bustime.ttc.ca](https://bustime.ttc.ca/), I started by inspecting the call stack for the API call.
+![call-stack](@call-stack.png)
+I quickly found this interesting code snippet:
+```js
+convertUrl(k) {
+    let G = j.N.serverUrl;
+    k.includes("restricted=true") ? G += "api/restricted/v1/" : G += "api/v3/";
+    const $ = "requestType=";
+    let K = k.substring(k.indexOf($) + $.length);
+    const ce = K.indexOf("&");
+    return K = K.substring(0, ce < 0 ? K.length : ce),
+    G += K + k + "&key=Qskvu4Z5JDwGEVswqdAVkiA5B&format=json", // what's this?!
+    G
+}
+```
+
+No... It can't be... A HARDCODED API KEY?!?!
+
+LMFAO
+
+
+But why when I try `https://bustime.ttc.ca/bustime/api/v3/getpredictions?...key=Qskvu4Z5JDwGEVswqdAVkiA5B...`, why doesn't it work?
+
+After poking around some more, I found this:
+```
+intercept(o, t) {
+    let S = o;
+    return this.isGetTimeCall(S) || this.devAPIService.getLocalSynchronizedServerTime().subscribe(oe => {
+        const ye = oe.toUTCString();
+        S = S.clone({
+            headers: S.headers.set("X-Date", ye)
+        });
+        const Ue = this.getApiEndpoint(S)
+          , qe = this.hashData(Ue + ye, "SHA256");
+        S = S.clone({
+            headers: S.headers.set("X-Request-ID", qe.toString())
+        })
+    }
+    ),
+    t.handle(S)
+}
+// ...
+hashData(o, t) {
+    const _ = ap["Hmac" + t];
+    return _ ? _(o, "ZSqCAFdU7bwxHJUHKYfQUxKin06hMxCK").toString(ap.enc.Hex) : "" // oh no not again
+}
+```
+
+Hmm... What's this? Another hardcoded key?
+... Yeah it's just hashing the URL + date to get a request ID, with a hardcoded secret key. lmao
+
+After asking an LLM to help me generate some code to sign the requests:
+![It works](@it-works.png)
+
+It works! I got some data out of it!
+
+After doing a quick search online of `Qskvu4Z5JDwGEVswqdAVkiA5B` to see if anyone else has found it before, I landed on the only result:
+![Google](@google.png)
+
+[Unpacking Clever Devices' BusTracker](https://weilage.dev/posts/unpacking-clever-devices-bustracker/) by Jack Weilage (give it a read, it's really interesting!)
+
+It turns out, bustime is a product sold by [cleverdevices](https://www.cleverdevices.com/products/bustime/) that allows transit agencies to track their vehicles stats, etc...
+And they use the same hardcoded API key for every single transit agency...
+
+Epic

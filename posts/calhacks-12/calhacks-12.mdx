@@ -51,4 +51,19 @@ To make matters worse, we were hit with one issue after another: the demo would 
 
 # So, what did we build?
 
-Hi! This section is a WIP, so come back later!
+**Hi! this section is still a WIP! Check back later!**
+
+## The onboarding flow
+Candidates get an assignment that essentially boils down to: "Create an e-commerce product list..."
+
+## The IDE
+We built a fully in-browser cursor-like IDE using [Monaco](https://monaco.microsoft.com) as the text editor with syntax highlighting, [WebContainer](https://webcontainer.io) as the unix container that runs web previews etc..., [zen-fs](https://github.com/zen-fs/) as the filesystem, and [React](https://react.dev) + [Tailwind](https://tailwindcss.com/) for the frontend bringing it all together.
+
+### The AI
+We used the vercel [AI SDK](http://ai-sdk.dev/) + Claude Sonnet 4.5 as the underlying model powereing the AI features including chat, assignment generation, and grading.
+
+The LLM generated diffs that were then shown in UI and applied. Because LLMs are sometimes bad at generating correct diffs, I implemented an automatic failover to Claude Haiku 
+
+
+
+## The grader
