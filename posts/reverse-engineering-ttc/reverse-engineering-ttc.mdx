@@ -1,51 +1,62 @@
 ---
 title: "Reverse Engineering the TTC API"
-summary: "How I built a free, unofficial bus and streetcar arrival times API for the Toronto Transit Commission"
+summary: "How I reverse engineered the Toronto Transit Commission's internal API"
 date: "2025-11-19"
 author: "Evan Yu"
 ---
-import { TwitterTweetEmbed } from 'react-twitter-embed';
 
-It's Nov 19, I'm procrastinating studying for my exams by scrolling on twitter. Over the last week, I've been seeing this LED matrix
-display with bus times (tidbyt) getting some traction.
+import { TwitterTweetEmbed } from "react-twitter-embed";
 
-Then, I see this tweet:
-<TwitterTweetEmbed tweetId="1990948613321535773" options={{ theme: "dark", cards: "hidden" }} />
+**Hi! I wrote this blog post at 4am, and am currently very sleep deprived. I will finish and properly edit and clean it up later** (when i feel like it)
+For now, I've told gpt-5 to fix a couple grammar issues and whatever, have fun reading :)
 
+## The spark
+It's Nov 19, and I'm procrastinating studying for exams by scrolling Twitter. Over the last week, I've been seeing this LED matrix display with bus times (Tidbyt) getting some traction.
+
+Then I see this tweet:
+
+<TwitterTweetEmbed
+  tweetId="1990948613321535773"
+  options={{ theme: "dark", cards: "hidden" }}
+/>
 
 > (TTC soon)
 
-*It can't be that hard to reverse engineer the TTC API, right?*
-This was the thought that threw me down the rabbit hole. I started by doing a quick Google search, since someone's probably already done it, right?
-Nope. The only result was [`https://myttc.ca/developers`](https://myttc.ca/developers), a nearly twenty year old project that didn't seem to work anymore.
+_It can't be that hard to reverse engineer the TTC API, right?_ That thought threw me down the rabbit hole.
+
+## The obvious search
+I started with a quick Google search, because someone's probably already done it, right? Nope. The only result was [`https://myttc.ca/developers`](https://myttc.ca/developers), a nearly twenty‑year‑old project that doesn't seem to work anymore.
 
 ![MyTTC Error](@myttc-error.png)
-Pretty funny, haha
+Pretty funny.
 
-So, I started by poking around the TTC website, recording and analyzing it's network traffic. My google searches also yielded one website: [`https://bustime.ttc.ca/`](https://bustime.ttc.ca/), which looked promising.
+## Poking around TTC and Bustime
+So I started poking around the TTC website, recording and analyzing its network traffic. My search also surfaced [`https://bustime.ttc.ca/`](https://bustime.ttc.ca/), which looked promising.
 ![Bustime](@bustime-1.png)
 
-However, when I tried to call one of it's API endpoints, I was denied access!
+However, when I tried to call one of its API endpoints, I was denied access.
 ![Bustime Error](@bustime-access-denied.png)
 
-After some quick googling, I also found this: [`https://bustime.ttc.ca/gtfsrt/`](https://bustime.ttc.ca/gtfsrt/) (gtfsrt = [General Transit Feed Specification Real-Time](https://gtfs.org/documentation/realtime/reference/)), it looked like exactly what I was looking for!
+After a bit more Googling, I found [`https://bustime.ttc.ca/gtfsrt/`](https://bustime.ttc.ca/gtfsrt/) (GTFS‑RT = [General Transit Feed Specification Real‑Time](https://gtfs.org/documentation/realtime/reference/)). It looked exactly like what I wanted.
 
-I spun up a quick parser using protobuf and a couple outer libraries, and I got some data out of it!
+I spun up a quick parser using protobuf and a couple of libraries, and I got some data out of it.
 
-I then realized the gtfsrt data was incomplete, and didn't include much of the data I was looking for (street names, bus lines, etc...).
+I then realized the GTFS‑RT data was incomplete and didn't include much of the data I needed (street names, bus lines, etc.).
 
-So, I started digging through https://ttc.ca/ again.
+## The TTC routedetail endpoints
+So I started digging through [ttc.ca](https://ttc.ca/) again.
 ![TTC Website](@ttc-website.png)
 
-I found `https://www.ttc.ca/ttcapi/routedetail/GetNextBuses?routeId=510&stopCode=7347`, looks like exactly what I was looking for!
+I found `https://www.ttc.ca/ttcapi/routedetail/GetNextBuses?routeId=510&stopCode=7347`, looks like it's going to be a hit!
 ![Nextbus API](@nextbus-api.png)
 
-Nope... Not the fine grained data I was looking for.
+Nope—still not the fine‑grained data I wanted.
 
 What about `https://www.ttc.ca/ttcapi/routedetail/get?id=310`?
 ![Route Detail API](@routedetail-get-1.png)
 
 That's more like it! I got something like this:
+
 ```js
 z.object({
   message: z.string().nullable(),
@@ -79,19 +90,21 @@ z.object({
 });
 ```
 
-... and `https://www.ttc.ca/ttcapi/routedetail/bystopcode?stopcode=7347` gives an array of routes that serve that stop!
+... and `https://www.ttc.ca/ttcapi/routedetail/bystopcode?stopcode=7347` returns the array of routes serving that stop.
 
-... so now I should have everything I need to build the API right? ...right?
+## The missing piece: predictions
+So I should have everything I need to build the API, right? Right? ... Nope.
 
-... nope. I still need a list of time estimates for each route at each stop. `/GetNextBuses` does that, but it's not very detailed
-nor "safe" (imo) to parse. The GTFSRT vehicles endpoint includes a list of vehicles, but I would need to match that up with the
-GTFSRT trips endpoint to get some form of time estimate. I thought this was too complicated, and not very efficient.
+I still needed time estimates for each route at each stop. `/GetNextBuses` technically does that, but it's not very detailed nor (in my opinion) "safe" to parse. The GTFS‑RT vehicles endpoint lists vehicles, but I'd need to match it with the GTFS‑RT trips endpoint to estimate times. That felt too complicated and inefficient.
 
-My mind kept wandering back to the bustime website. If I could break it's auth, I could get all the data I want in once place.
-Going back to [bustime.ttc.ca](https://bustime.ttc.ca/), I started by inspecting the call stack for the API call.
+My mind kept wandering back to the Bustime website. If I could break its auth, I could get everything I wanted in one place.
+
+## Breaking Bustime's auth
+Back on [bustime.ttc.ca](https://bustime.ttc.ca/), I started by inspecting the call stack for an API call.
 ![call-stack](@call-stack.png)
-I quickly found this interesting code snippet:
-```js
+I quickly found this interesting snippet:
+
+```js "Qskvu4Z5JDwGEVswqdAVkiA5B"
 convertUrl(k) {
     let G = j.N.serverUrl;
     k.includes("restricted=true") ? G += "api/restricted/v1/" : G += "api/v3/";
@@ -104,15 +117,15 @@ convertUrl(k) {
 }
 ```
 
-No... It can't be... A HARDCODED API KEY?!?!
+No... it can't be... a HARDCODED API KEY?!
 
 LMFAO
 
-
-But why when I try `https://bustime.ttc.ca/bustime/api/v3/getpredictions?...key=Qskvu4Z5JDwGEVswqdAVkiA5B...`, why doesn't it work?
+But why, when I try `https://bustime.ttc.ca/bustime/api/v3/getpredictions?...key=Qskvu4Z5JDwGEVswqdAVkiA5B...`, it doesn't work?
 
 After poking around some more, I found this:
-```
+
+```js "ZSqCAFdU7bwxHJUHKYfQUxKin06hMxCK"
 intercept(o, t) {
     let S = o;
     return this.isGetTimeCall(S) || this.devAPIService.getLocalSynchronizedServerTime().subscribe(oe => {
@@ -136,20 +149,23 @@ hashData(o, t) {
 }
 ```
 
-Hmm... What's this? Another hardcoded key?
-... Yeah it's just hashing the URL + date to get a request ID, with a hardcoded secret key. lmao
+Hmm... what's this? Another hardcoded key?
+Yup... it's hashing the URL + date to get a request ID with a hardcoded secret key. lmao
 
 After asking an LLM to help me generate some code to sign the requests:
 ![It works](@it-works.png)
 
 It works! I got some data out of it!
 
-After doing a quick search online of `Qskvu4Z5JDwGEVswqdAVkiA5B` to see if anyone else has found it before, I landed on the only result:
+### A note on Bustime and Clever Devices
+After a quick search for `Qskvu4Z5JDwGEVswqdAVkiA5B` to see if anyone else had found it, I landed on the only result:
 ![Google](@google.png)
 
-[Unpacking Clever Devices' BusTracker](https://weilage.dev/posts/unpacking-clever-devices-bustracker/) by Jack Weilage (give it a read, it's really interesting!)
+[Unpacking Clever Devices' BusTracker](https://weilage.dev/posts/unpacking-clever-devices-bustracker/) by Jack Weilage (worth a read!)
 
-It turns out, bustime is a product sold by [cleverdevices](https://www.cleverdevices.com/products/bustime/) that allows transit agencies to track their vehicles stats, etc...
-And they use the same hardcoded API key for every single transit agency...
+It turns out Bustime is a product sold by [Clever Devices](https://www.cleverdevices.com/products/bustime/) that allows transit agencies to track vehicle stats, etc. And they use the same hardcoded API key across agencies.
 
 Epic
+
+## What's next
+I'm packaging this into a free, unofficial TTC arrivals API. I'll update this blog post soon-ish with the details when it's done.
