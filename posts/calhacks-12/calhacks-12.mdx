@@ -51,19 +51,161 @@ To make matters worse, we were hit with one issue after another: the demo would 
 
 # So, what did we build?
 
-**Hi! this section is still a WIP! Check back later!**
+VibeCheck is a full-stack interview platform that evaluates candidates in a realistic development environment with AI assistance. The platform consists of three main components: the onboarding flow, the in-browser IDE, and the holistic grading system.
 
 ## The onboarding flow
-Candidates get an assignment that essentially boils down to: "Create an e-commerce product list..."
+
+Candidates begin by selecting their preferred framework (React Router v7 or Next.js) and experience level. Based on these selections, our AI generates a personalized coding challenge that matches their skill level.
+
+The assignments are real-world scenarios, like building an e-commerce product list with filtering and sorting, creating a blog dashboard with CRUD operations, or implementing a task management system. These aren't your typical LeetCode problems—they're tasks that actually test whether you can build functional, user-facing applications with the help of AI, just like you would on the job.
+
+The system dynamically generates:
+- A detailed project specification with requirements and acceptance criteria
+- A custom rubric for grading based on the specific challenge
+- Framework-specific boilerplate code to get candidates started quickly
+
+Once the challenge is generated, candidates are dropped into the IDE where they can code with full AI assistance for a set time period (typically 60-90 minutes).
 
 ## The IDE
-We built a fully in-browser cursor-like IDE using [Monaco](https://monaco.microsoft.com) as the text editor with syntax highlighting, [WebContainer](https://webcontainer.io) as the unix container that runs web previews etc..., [zen-fs](https://github.com/zen-fs/) as the filesystem, and [React](https://react.dev) + [Tailwind](https://tailwindcss.com/) for the frontend bringing it all together.
 
-### The AI
-We used the vercel [AI SDK](http://ai-sdk.dev/) + Claude Sonnet 4.5 as the underlying model powereing the AI features including chat, assignment generation, and grading.
+We built a fully in-browser Cursor-like IDE that feels like a real development environment. The architecture consists of several key pieces:
 
-The LLM generated diffs that were then shown in UI and applied. Because LLMs are sometimes bad at generating correct diffs, I implemented an automatic failover to Claude Haiku 
+- **[Monaco Editor](https://monaco.microsoft.com)** - The same editor that powers VS Code, providing syntax highlighting, IntelliSense, and familiar keyboard shortcuts
+- **[WebContainer](https://webcontainer.io)** - A full Node.js runtime that runs entirely in the browser, allowing us to execute npm commands, run dev servers, and preview applications without any backend infrastructure
+- **[zen-fs](https://github.com/zen-fs/)** - An in-memory filesystem that provides a Unix-like file system interface, enabling file operations, directory traversal, and proper file watching
+- **[React](https://react.dev) + [Tailwind](https://tailwindcss.com/)** - For building a responsive, modern UI that ties everything together
 
+The IDE features a split-pane layout with the code editor on the left, a live preview on the right, and an AI chat interface accessible via a sidebar. Candidates can edit files, see changes reflected in real-time in the preview, and interact with the AI assistant to help them build their solution.
 
+One of the biggest technical challenges was getting WebContainer, Monaco, and zen-fs to all work together seamlessly. We had to carefully manage file system synchronization to ensure changes made by the AI or the editor were immediately reflected across all systems.
+
+## The AI
+
+We used the Vercel [AI SDK](http://ai-sdk.dev/) with Claude Sonnet 4.5 as the underlying model powering all AI features, including chat, assignment generation, and code editing.
+
+The AI assistant can help candidates in several ways:
+- Answering questions about the requirements
+- Suggesting architectural approaches
+- Generating code snippets or entire files
+- Debugging errors and issues
+- Refactoring existing code
+
+The LLM generates diffs in a structured format that we parse and display in the UI before applying them to the files. Because LLMs occasionally produce malformed diffs (especially with complex multi-file changes), I implemented an automatic failover system: if the diff fails to apply cleanly, we fall back to Claude Haiku with a simpler prompt that manually reconstructs the file with the intended changes.
+
+This dual-model approach significantly improved reliability—candidates rarely encountered failed edits, even when the AI was making complex cross-file changes.
 
 ## The grader
+
+The holistic grading system uses Claude Sonnet 4.5 to evaluate submissions across multiple dimensions. Unlike traditional automated tests that only check if the code works, our grader considers code quality, architecture decisions, error handling, user experience, and most importantly, how effectively the candidate utilized AI assistance.
+
+The grading system analyzes the entire codebase and provides:
+```ts
+function getGradingPrompt(
+  challenge: string,
+  framework: string,
+  rubric: Record<string, unknown>,
+  code: Record<string, string>,
+): string {
+  const codeString = Object.entries(code)
+    .map(([path, content]) => `// ${path}\n${content}`)
+    .join("\n\n---\n\n");
+
+  return `
+You are an expert technical interviewer grading a coding assessment. The candidate used AI assistance during this assessment.
+
+## CHALLENGE
+${challenge}
+
+## FRAMEWORK
+${framework === "react-router-v7" ? "React Router v7" : "Next.js"}
+
+## GRADING RUBRIC
+${JSON.stringify(rubric, null, 2)}
+
+## SUBMITTED CODE
+${codeString}
+
+## INSTRUCTIONS
+1. Grade each category in the rubric based on the submitted code
+2. Assign scores (0-100) for each category
+3. Provide specific, actionable feedback that references actual code
+4. Mark each criterion as "passed", "partial", or "failed"
+5. Calculate the overall score using the weighted average from rubric
+6. Assess AI utilization effectiveness (how well they used AI assistance)
+7. Assess adherence to the original prompt/requirements
+8. Be fair but rigorous - this was AI-assisted, so expectations are higher for code quality
+
+## IMPORTANT
+- Look for framework-specific best practices (${
+    framework === "react-router-v7"
+    ? "loaders, actions, routing"
+    : "Server Components, Server Actions, App Router"
+})
+- Consider code organization, error handling, and user experience
+- Check if requirements were met
+- Evaluate the quality of AI usage (clear variable names, good structure suggests good prompting)
+
+## OUTPUT FORMAT
+Return ONLY valid JSON in this exact structure:
+{
+"overallScore": 82,
+"overallGrade": "Good",
+"categories": [
+    {
+    "name": "Category Name from Rubric",
+    "score": 85,
+    "grade": "Excellent|Great|Good|Needs Improvement|Poor",
+    "feedback": "Specific feedback referencing actual code...",
+    "criteria": [
+        {
+        "name": "Criterion Name",
+        "status": "passed|partial|failed"
+        }
+    ]
+    }
+],
+"aiUtilization": {
+    "effectiveness": 88,
+    "feedback": "Analysis of how effectively AI was used..."
+},
+"adherenceToPrompt": 78,
+"strengths": ["Strength 1", "Strength 2"],
+"areasForImprovement": ["Area 1", "Area 2"]
+}`;
+}
+```
+
+The grader returns detailed feedback on each category in the rubric, identifying strengths and areas for improvement. It also evaluates "AI utilization effectiveness"—a metric that measures whether the candidate used AI as a productivity tool or as a crutch.
+For example, clear variable names, good code organization, and thoughtful error handling indicate effective prompting and understanding, while messy, inconsistent code suggests blind copy-pasting.
+
+## The results
+
+After presenting VibeCheck during the judging session, we received overwhelmingly positive feedback from both fellow hackers, judges, and sponsors (especially Anthropic!). Many people resonated with our mission to modernize technical interviews to reflect how developers actually work today.
+
+While we didn't place in the official rankings, we walked away with something more valuable: validation that we were solving a real problem. 
+
+# Reflections
+
+CalHacks 12.0 was, without a doubt, the hardest hackathon I've attended to date. I was sick throughout the entire event, pulling an all-nighter Saturday into Sunday, coding until 7 a.m. with a sore throat and low fever, fueled purely by adrenaline, determination, and a unhealthy amount of caffiene that probably
+took 10 years off my lifespan.
+
+Yet despite all of this, I shipped like I've never shipped before. Building VibeCheck was one of the most intense and rewarding experiences of my life. I'm especially proud of what we managed to ship in such a short timeframe: a fully functional interview platform that re-implements Cursor's AI-assisted coding experience **in the browser**, in just 48 hours.
+<u>When you're sick, sleep-deprived, and racing against the clock, you learn what you're truly capable of.</u>
+
+
+## A few key takeaways:
+
+**AI is a force multiplier.** We extensively used Claude, Cursor, and ChatGPT throughout development. The AI helped us ship faster, debug issues, and implement features we weren't familiar with. Ironically, we proved our own thesis: that AI doesn't replace developers, it makes good developers even more productive.
+
+**["Just make it exist first, you can make it good later."](https://www.reddit.com/r/GetMotivated/comments/1kjr24k/make_it_exist_first_image/)** We cut a lot of corners and shipped features that were "good enough" rather than perfect. The UI could have been prettier, the AI could have been smarter, the grader could have been more sophisticated. But we prioritized getting something functional into people's hands.
+
+Most importantly, this project reinforced my belief that the future of technical interviews shouldn't be about memorizing algorithms or whiteboarding tree traversals. It should be about evaluating how effectively you can leverage the tools available to you to build something real.
+
+**AI is here to stay, and if we don't adapt, we'll be left behind.**
+
+<hr />
+
+Thank you for reading! If you're interested, star the code on [GitHub](https://github.com/ngethan/vibecheck), and check out the [Devpost](https://devpost.com/software/igotrejectedfrominternshipsbcicantleetcodesoimadethisplatfor)!
+
+Also read [Ethan's blog post](https://ethanng.dev/writing/building-vibecheck) for his perspective!
+
