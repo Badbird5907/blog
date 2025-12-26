@@ -3,6 +3,7 @@ title: "Building Vibecheck: Re-imagining technical interviews at CalHacks 12.0"
 summary: "My experience building Vibecheck at Calhacks 12.0"
 date: "2025-11-04"
 author: "Evan Yu"
+banner: "demos/editor-2.png"
 ---
 
 Two weeks ago, I travelled to San Francisco with 3 friends to participate in Cal Hacks 12.0, a 48 hour hackathon hosted by UC Berkeley at the Palace of Fine arts.
@@ -66,6 +67,13 @@ The system dynamically generates:
 
 Once the challenge is generated, candidates are dropped into the IDE where they can code with full AI assistance for a set time period (typically 60-90 minutes).
 
+<Carousel
+    items={[
+        { src: "@demos/onboarding-1.png", caption: "Assignment generation" },
+        { src: "@demos/onboarding-2.png", caption: "Framework selection" },
+    ]}
+/>
+
 ## The IDE
 
 We built a fully in-browser Cursor-like IDE that feels like a real development environment. The architecture consists of several key pieces:
@@ -78,6 +86,12 @@ We built a fully in-browser Cursor-like IDE that feels like a real development e
 The IDE features a split-pane layout with the code editor on the left, a live preview on the right, and an AI chat interface accessible via a sidebar. Candidates can edit files, see changes reflected in real-time in the preview, and interact with the AI assistant to help them build their solution.
 
 One of the biggest technical challenges was getting WebContainer, Monaco, and zen-fs to all work together seamlessly. We had to carefully manage file system synchronization to ensure changes made by the AI or the editor were immediately reflected across all systems.
+
+<Carousel items={[
+  { src: "@demos/editor-1.png", caption: "Preview in-editor" },
+  { src: "@demos/editor-2.png", caption: "AI Editor" },
+  { src: "@demos/search.png", caption: "Search" },
+]} />
 
 ## The AI
 
@@ -98,7 +112,7 @@ This dual-model approach significantly improved reliability—candidates rarely 
 
 The holistic grading system uses Claude Sonnet 4.5 to evaluate submissions across multiple dimensions. Unlike traditional automated tests that only check if the code works, our grader considers code quality, architecture decisions, error handling, user experience, and most importantly, how effectively the candidate utilized AI assistance.
 
-The grading system analyzes the entire codebase and provides:
+The grading system analyzes the entire codebase with the following prompt:
 ```ts
 function getGradingPrompt(
   challenge: string,
@@ -209,3 +223,15 @@ Thank you for reading! If you're interested, star the code on [GitHub](https://g
 
 Also read [Ethan's blog post](https://ethanng.dev/writing/building-vibecheck) for his perspective!
 
+# Images
+
+<Carousel items={[
+  { src: "demos/onboarding-1.png", caption: "Assignment generation" },
+  { src: "demos/onboarding-2.png", caption: "Framework selection" },
+  { src: "demos/editor-1.png", caption: "Preview in-editor" },
+  { src: "demos/editor-2.png", caption: "AI Editor" },
+  { src: "demos/search.png", caption: "Search" },
+  { src: "demos/assessment-1.png", caption: "Assessment - Overview" },
+  { src: "demos/assessment-2.png", caption: "Assessment - Detailed Assessment" },
+  { src: "demos/assessment-3.png", caption: "Assessment - AI Utilization" },
+]} />
