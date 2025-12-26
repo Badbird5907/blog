@@ -110,9 +110,7 @@ The AI assistant can help candidates in several ways:
 - Debugging errors and issues
 - Refactoring existing code
 
-The LLM generates diffs in a structured format that we parse and display in the UI before applying them to the files. Because LLMs occasionally produce malformed diffs (especially with complex multi-file changes), I implemented an automatic failover system: if the diff fails to apply cleanly, we fall back to Claude Haiku with a simpler prompt that manually reconstructs the file with the intended changes.
-
-This dual-model approach significantly improved reliability—candidates rarely encountered failed edits, even when the AI was making complex cross-file changes.
+The LLM generates diffs in a structured format that we parse and display in the UI before applying them to the files. Because LLMs often produce malformed diffs, I implemented an automatic failover system: if the diff fails to apply cleanly, we instruct Claude Haiku to manually reconstruct the file with the intended changes.
 
 ## The grader
 
