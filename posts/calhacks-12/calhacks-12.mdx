@@ -3,7 +3,7 @@ title: "Building Vibecheck: Re-imagining technical interviews at CalHacks 12.0"
 summary: "My experience building Vibecheck at Calhacks 12.0"
 date: "2025-11-04"
 author: "Evan Yu"
-banner: "demos/editor-2.png"
+banner: "calhacks.png"
 ---
 
 Two weeks ago, I travelled to San Francisco with 3 friends to participate in Cal Hacks 12.0, a 48 hour hackathon hosted by UC Berkeley at the Palace of Fine arts.
@@ -44,11 +44,11 @@ That night, we had to vacate the apartment since Luke's brother had friends over
 I stayed up until 7 a.m. implementing proper tool calling on the client side and completing the integration between the onboarding flow and the submission flow.
 
 <Carousel items={[
-  { src: "@vivarium/vivarium.png", caption: "Vivarium" },
-  { src: "@vivarium/working-space.png", caption: "Our working space" },
-  { src: "@vivarium/car.png", caption: "Epic car" },
-  { src: "@vivarium/idk.png", caption: "Not sure what to caption this" },
-  { src: "@vivarium/wtf.png", caption: "I am at a loss for words" },
+  { src: "vivarium/vivarium.png", caption: "Vivarium" },
+  { src: "vivarium/working-space.png", caption: "Our working space" },
+  { src: "vivarium/car.png", caption: "Epic car" },
+  { src: "vivarium/idk.png", caption: "Not sure what to caption this" },
+  { src: "vivarium/wtf.png", caption: "I am at a loss for words" },
 ]} />
 
 ## Day 3: Chaos...
@@ -94,8 +94,8 @@ The IDE features a split-pane layout with the code editor on the left, a live pr
 One of the biggest technical challenges was getting WebContainer, Monaco, and zen-fs to all work together seamlessly. We had to carefully manage file system synchronization to ensure changes made by the AI or the editor were immediately reflected across all systems.
 
 <Carousel items={[
-  { src: "@demos/editor-1.png", caption: "Preview in-editor" },
   { src: "@demos/editor-2.png", caption: "AI Editor" },
+  { src: "@demos/editor-1.png", caption: "Preview in-editor" },
   { src: "@demos/search.png", caption: "Search" },
 ]} />
 
@@ -232,6 +232,9 @@ Also read [Ethan's blog post](https://ethanng.dev/writing/building-vibecheck) fo
 # Images
 
 <Carousel items={[
+  { src: "calhacks.png", caption: "CalHacks Event" },
+  { src: "badge.png", caption: "CalHacks 12.0 Badge" },
+  { src: "day0.png", caption: "Day 0" },
   { src: "demos/onboarding-1.png", caption: "Assignment generation" },
   { src: "demos/onboarding-2.png", caption: "Framework selection" },
   { src: "demos/editor-1.png", caption: "Preview in-editor" },
@@ -240,4 +243,9 @@ Also read [Ethan's blog post](https://ethanng.dev/writing/building-vibecheck) fo
   { src: "demos/assessment-1.png", caption: "Assessment - Overview" },
   { src: "demos/assessment-2.png", caption: "Assessment - Detailed Assessment" },
   { src: "demos/assessment-3.png", caption: "Assessment - AI Utilization" },
+  { src: "vivarium/vivarium.png", caption: "Vivarium" },
+  { src: "vivarium/working-space.png", caption: "Our working space" },
+  { src: "vivarium/car.png", caption: "Epic car" },
+  { src: "vivarium/idk.png", caption: "Not sure what to caption this" },
+  { src: "vivarium/wtf.png", caption: "I am at a loss for words" },
 ]} />
