@@ -87,7 +87,7 @@ Once the challenge is generated, candidates are dropped into the IDE where they 
 
 We built a fully in-browser Cursor-like IDE that feels like a real development environment. The architecture consists of several key pieces:
 
-- **[Monaco Editor](https://monaco.microsoft.com)** - The same editor that powers VS Code, providing syntax highlighting, IntelliSense, and familiar keyboard shortcuts
+- **[Monaco Editor](https://microsoft.github.io/monaco-editor/)** - The same editor that powers VS Code, providing syntax highlighting, IntelliSense, and familiar keyboard shortcuts
 - **[WebContainer](https://webcontainer.io)** - A full Node.js runtime that runs entirely in the browser, allowing us to execute npm commands, run dev servers, and preview applications without any backend infrastructure
 - **[zen-fs](https://github.com/zen-fs/)** - An in-memory filesystem that provides a Unix-like file system interface, enabling file operations, directory traversal, and proper file watching
 - **[React](https://react.dev) + [Tailwind](https://tailwindcss.com/)** - For building a responsive, modern UI that ties everything together
