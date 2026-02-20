@@ -1,0 +1,118 @@
+---
+title: "Winning TreeHacks: Re-defining education in 2026"
+summary: "How I built Minerva, and how it won twice at the best collegiate hackathon in the world"
+date: "2026-02-19"
+author: "Evan Yu"
+banner: "treehacks.jpg"
+bannerCenter: true
+---
+*This is v1 of the blog post. I'll be updating this post with more details later.*
+
+Last weekend, I travelled to Stanford (third time at SFO in the past year) to attend TreeHacks 12. Going into it, I had a couple goals:
+- Win a prize
+- Build something that I would be proud of
+- Get lots of free swag
+- Maybe get an internship offer for the summer
+- **Have fun**
+
+
+# Day 1: The Beginning
+## Arriving at TreeHacks
+I arrived at SFO on Friday morning, and met up with my friend [HorseNuggets](https://www.youtube.com/@HorseNuggets). He's a developer at Roblox, and was kind enough to offer a tour of the Roblox campus.
+After that, I took the Caltrain down to San Jose to kill a couple hours at the Microcenter, and pick up some white monsters.
+
+I also forgot my luggage at the airport security, which made for a [funny LinkedIn post](https://www.linkedin.com/feed/update/urn:li:activity:7428034051023888384/).
+
+<Carousel items={[
+  { src: "@arriving/flight.jpg", caption: "Flight" },
+  { src: "@arriving/sfo.jpg", caption: "SFO" },
+  { src: "@arriving/car.jpg", caption: "On the car to Roblox HQ" },
+  { src: "@arriving/roblox.jpg", caption: "Roblox HQ" },
+  { src: "@arriving/ram.jpg", caption: "Look at those RAM prices" },
+  { src: "@arriving/monsters.jpg", caption: "White monsters" },
+]} />
+
+I got to Stanford at around 4:00 PM, where the line to get in was **insanely long**. After checking in, I received my badge and swag bag, and then met up with my team: [Ular Kimsanov](https://www.linkedin.com/in/ukimsanov/), [Anton Angeletti](https://www.linkedin.com/in/anton-angeletti/), and [Manav Joshi](https://www.linkedin.com/in/mnkjoshi/).
+We grabbed some food and headed to the opening ceremony, where Garry Tan, CEO of Y Combinator, gave a passionate speech, calling for people to build things that matter, and urging everyone to "boil the ocean."
+Sam Altman, CEO of OpenAI, then joined the TreeHacks team on stage for a candid interview.
+
+<Carousel items={[
+    {src: "@badge.jpg", caption: "My TreeHacks 2026 Badge"},
+    {src: "@arriving/15k.jpg", caption: "15k applicants, 1000 accepted"},
+    {src: "@arriving/saltman.jpg", caption: "Sam Altman"},
+]} />
+
+## Hacking Starts
+
+[Anton](https://www.linkedin.com/in/anton-angeletti/) had already found/claimed one of the only private study rooms available in the building, so we all piled in and started setting up. Having this room to ourselves
+really helped us focus on the task at hand, and even get some sleep at night with a air mattress Anton also brought.
+
+A week before the hackathon, we had already compiled a list of viable ideas, and we decited on going with our initial idea: an AI tutoring platform that can help students learn any topic. We then decided to brainstorm a bit more, and landed on this:
+An AI tutor that you can video call (With HeyGen's LiveAvatar) and have a natural conversation with. The tutor would be able to help the student with any topic, and have the tools to help visually represent the concepts.
+
+<BlogImage src="@brainstorming.jpg" alt="Brainstorming on the whiteboard" />
+
+After that, we spent the next few hours researching and planning out the project. Then Me, Manav, and Anton decided to try and get some sleep.
+Ular, on the other hand, wasn't tired and decided to stay up all night and get the project bootstrapped. This included setting up the Next.js project, and getting the Zoom Video SDK to display the HeyGen LiveAvatar in the browser.
+
+## Day 2 - The Fun Part
+Saturday morning, I woke up with only 3 hours of sleep (I wasn't really able to sleep), and took over the project from Ular. While I was doing that, Manav focused on going around to the different sponsors and pitching our ideas to them.
+This is a crucial part of the hackathon, as it'll get your team on the radar of the sponsors, and they may help steer you in the right direction.
+
+Remember when I said I wanted to **have fun**? In previous hacakthons, I would spend the entire hackathon coding, and not really enjoying the experience. This time, I wanted to make sure I participated in as many activities as possible, and really enjoy the experience.
+So, in between coding sessions (while I had a coding agent running), I would go around to different sponsor booths, chat with the sponsors, and get free swag.
+
+They even brought live llamas outside the venue... because why not? It was a great little break from staring at a screen.
+
+At one point, the Poke booth had a vending machine full of Apple products. The catch? You had to convince an AI (Poke in bouncer mode) that you deserved it. I walked away with free AirPods, but in hindsight, if I'd just said "I want the iPhone 17 Pro" instead of "I'll take *either* the AirPods or the iPhone," I probably could have walked away with a much bigger win. Manav proved it too, by walking straight up and asking for the phone, and getting it. Lesson learned. 🙃
+
+We ended off the day with a lightsaber fight outside the venue for a LEGO starwars set, which (of course) Manav won.
+
+of course, all of this was sprinkled in between long coding sessions. We ended up getting the MVP completed by midnight. We then spent the rest of the night polishing up the project, and working on getting the latency down.
+
+<Carousel items={[
+    {src: "@poke-airpods.png", caption: "The airpods I won"},
+    {src: "@llamas.jpg", caption: "Live llamas"},
+    {src: "@lightsabers.jpg", caption: "Lightsabers"},
+]} />
+
+
+## Day 3 - Winning
+
+By morning, we were all exhausted, but we had a polished demo ready to go.
+
+
+But then... disaster struck.
+
+<div className="font-serif text-center border-2 border-primary rounded-lg p-4 flex flex-col items-center justify-center gap-2">
+<span className="font-bold">Murphy's Law:</span>
+<span>Anything that can go wrong, will go wrong.</span>
+</div>
+
+Everything was working perfectly 30 minutes before hacking ended. But then, as we were trying to record our demo video, our logic for displaying Manim (math animation) videos broke.
+
+We scrambled to fix it, and just five minutes before the devpost was due, we managed to get it working and recorded our demo video.
+
+### Judging
+
+Once judging started, we made our way to our table and set up. I had brought my DJI Mic Mini with me (and was using it to vlog), so we used it as a input microphone for our demo.
+However, one thing we didn't account for was the background noise. The mic was picking up our voices, but the output was practically silent. We also didn't have a speaker to boost the volume.
+
+We were stationed next to a locked door, so Manav went around the building, found another entrance that was open, and let us in. Ular and I set up just outside and funneled judges into the empty area beyond the door, where it was much quieter.
+
+We then proceeded to demo our project, and it went surprisingly well. None of the demos failed, and we even heard the HeyGen people were *very* impressed with our project.
+
+### The Results
+
+The Zoom and HeyGen teams both had to leave the hackathon early, so they let us know we won **First Place in the Education Track** and **Best Creation with HeyGen Avatar API** tracks!!
+
+<Carousel items={[
+    {src: "@zoom.jpg", caption: "First Place in the Education Track"},
+    {src: "@heygen.jpg", caption: "Best Creation with HeyGen Avatar API"},
+]} />
+
+
+
+# So... What did we build?
+
+WIP!!! Come back soon!
