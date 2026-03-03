@@ -115,4 +115,33 @@ The Zoom and HeyGen teams both had to leave the hackathon early, so they let us 
 
 # So... What did we build?
 
-WIP!!! Come back soon!
+<YouTubeEmbed videoId="vK0Tob8xZKE" />
+
+## The Video tutor
+
+Minerva is an AI tutor that you video call. Under the hood, we use HeyGen's LiveAvatar to render a live avatar and the Zoom Video SDK to display it in the browser. The user's voice is transcribed using the web [SpeechRecognition API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition). We use HeyGen's Full mode purely for text-to-speech, but bypass its voice input entirely so that we can handle LLM inference on our end; giving us full control over tool calls and response logic.
+
+## The Secret Sauce
+
+For visual explanations, Manim animations are rendered on the fly by delegating code generation to a slower but smarter model (Claude Opus 4.5), which writes and executes the Python Manim code to produce the animations. We also integrate Desmos, Desmos 3D, and GeoGebra to render math equations, graphs, and 3D objects. The model can additionally generate custom "applets" by writing HTML, CSS, and JS that get embedded directly into the page via an iframe.
+
+# What I learned
+
+Execution and presentation matter just as much as, if not more than, the technical implementation. Minerva isn't a groundbreaking idea, nor is it a *very* technically impressive project, but the way we executed and presented it is what made it stand out. If a project doesn't "click" for the judges, it's not going to win. We spent a lot of time polishing the experience and making sure it was intuitive and easy to understand. We also made a point of looping in judges throughout the event, asking for their opinions and feedback, and making ourselves known to them. At the end of the day, they're the ones deciding who wins, so that relationship matters. It paid off: we had multiple judges come up to us saying "We heard about this project and had to come over to check it out."
+(they don't have time to judge every project in person)
+
+Having been to 10 hackathons, I've noticed a consistent trend: especially with the rise of AI, technical implementation is becoming less and less of a differentiator. Anyone can write a few sentences (along with "make no mistakes") prompt and get modern models to build almost *anything*. The real differentiator now is the quality of execution and how well you can present the idea.
+(what makes your project stand out from all the other AI slop?)
+
+Prompt engineering was also critical to getting the best results out of the model. We ran into many issues where it would behave unexpectedly (like trying to visualize the solar system on the graphing calculator), and I spent a significant amount of time tweaking the system prompt, carefully adjusting the wording and adding plenty of examples to guide the model toward the right behavior.
+
+# What's next?
+We're in the process of rebuilding Minerva to be production-ready, and will release it in the coming months :)
+
+
+As for TreeHacks, I'll definitely be back next year. There was something special about the atmosphere at TreeHacks that I've never experienced at other hackathons. Perhaps it was the high bar for entry and the selectiveness, or it was the density of genuinely talented, motivated people all in one room, everyone you talked to was building something interesting and had a story worth hearing (especially the sponsors!).
+Whatever it was, it made the whole weekend feel less like a competition and more like a community. I can't wait to go back.
+
+If you enjoyed this post, please consider Giving Minerva a Like on [Devpost](https://devpost.com/software/minerva-3sj6z0), and Starring the [GitHub repository](https://github.com/anton-3/minerva)!
+
+[Also read my other blog post about CalHacks 12](/blog/calhacks-12) (we didn't win, but we built something I'm really proud of)
